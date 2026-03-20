@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Ortografía Magisterio · Ábacos Centro de Estudios</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,400&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --rojo:#C8102E; --rojo-h:#a50d26; --negro:#111; --gm:#666;
+  --gc:#f3f3f3; --bl:#fff; --borde:#e0e0e0;
+  --ok:#1a7d3e; --ok-bg:#e6f4ec; --err:#c8102e; --err-bg:#fde8ec;
+  --sh:0 4px 24px rgba(0,0,0,.10); --r:10px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Source Serif 4',Georgia,serif;background:var(--gc);color:var(--negro);min-height:100vh;display:flex;flex-direction:column}
+
+/* HEADER */
+header{background:var(--bl);border-bottom:3px solid var(--rojo);padding:14px 22px;display:flex;align-items:center;gap:14px;box-shadow:var(--sh)}
+header img{height:64px;width:auto;flex-shrink:0}
+.ht h1{font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:900;line-height:1.1}
+.ht h1 span{color:var(--rojo)}
+.ht p{font-size:.82rem;color:var(--gm);margin-top:2px;font-style:italic}
+.ht .nivel{display:inline-block;background:var(--rojo);color:#fff;border-radius:4px;padding:2px 9px;font-size:.7rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-top:4px}
+
+/* MAIN */
+main{flex:1;max-width:960px;width:100%;margin:24px auto;padding:0 16px 48px}
+
+/* PANTALLA SELECCIÓN */
+#ps{animation:fi .35s ease}
+.ps-head{margin-bottom:20px}
+.ps-head h2{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:900;margin-bottom:4px}
+.ps-head p{font-size:.88rem;color:var(--gm);font-style:italic}
+
+.sel-actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:18px}
+.sel-info{flex:1;font-size:.83rem;color:var(--gm);font-style:italic}
+.sel-info strong{color:var(--rojo);font-style:normal}
+
+/* bloques */
+.bloque{background:var(--bl);border:1px solid var(--borde);border-radius:var(--r);margin-bottom:14px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.05)}
+.bloque-header{display:flex;align-items:center;gap:12px;padding:13px 18px;cursor:pointer;user-select:none;transition:background .15s}
+.bloque-header:hover{background:#fafafa}
+.bloque-header.abierto{background:#fff8f9;border-bottom:1px solid var(--borde)}
+.bloque-icono{font-size:1.3rem;width:32px;text-align:center;flex-shrink:0;font-family:'Playfair Display',serif;font-weight:900;color:var(--rojo)}
+.bloque-info{flex:1}
+.bloque-nombre{font-family:'Playfair Display',serif;font-size:1rem;font-weight:700}
+.bloque-desc{font-size:.77rem;color:var(--gm);margin-top:1px}
+.bloque-badge{font-size:.7rem;font-weight:700;letter-spacing:.05em;background:var(--gc);border:1px solid var(--borde);border-radius:12px;padding:2px 10px;color:var(--gm);white-space:nowrap}
+.bloque-badge.tiene{background:#fff0f2;border-color:#f5c6ce;color:var(--rojo)}
+.bloque-chevron{font-size:.8rem;color:var(--gm);transition:transform .2s;flex-shrink:0}
+.bloque-header.abierto .bloque-chevron{transform:rotate(90deg)}
+.bloque-cats{display:none;padding:12px 14px 14px;gap:8px;flex-wrap:wrap}
+.bloque-cats.visible{display:flex}
+.subcat{display:flex;align-items:center;gap:8px;border:2px solid var(--borde);border-radius:8px;padding:9px 14px;cursor:pointer;background:var(--bl);transition:border-color .15s,background .15s,transform .1s;user-select:none;flex:1;min-width:160px}
+.subcat:hover{border-color:var(--rojo);transform:translateY(-1px)}
+.subcat.sel{border-color:var(--rojo);background:#fff5f7}
+.subcat-check{width:18px;height:18px;border-radius:50%;border:2px solid var(--borde);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .15s,border-color .15s}
+.subcat.sel .subcat-check{background:var(--rojo);border-color:var(--rojo)}
+.subcat-check svg{width:9px;height:9px;display:none}
+.subcat.sel .subcat-check svg{display:block}
+.subcat-nombre{font-size:.88rem;font-weight:700;font-family:'Playfair Display',serif}
+.subcat-n{font-size:.72rem;color:var(--gm);margin-top:1px}
+
+/* botones */
+.btn{font-family:inherit;font-size:.9rem;font-weight:600;border:none;border-radius:6px;padding:10px 22px;cursor:pointer;transition:background .15s,transform .1s;letter-spacing:.02em}
+.btn:active{transform:scale(.97)}
+.btn-rojo{background:var(--rojo);color:#fff}.btn-rojo:hover{background:var(--rojo-h)}
+.btn-negro{background:var(--negro);color:#fff}.btn-negro:hover{background:#333}
+.btn-outline{background:transparent;color:var(--gm);border:1px solid var(--borde)}.btn-outline:hover{border-color:var(--rojo);color:var(--rojo)}
+
+/* PANTALLA PRÁCTICA */
+#pp{display:none;animation:fi .3s ease}
+
+.sesion-bar{background:var(--bl);border:1px solid var(--borde);border-radius:var(--r);padding:11px 18px;margin-bottom:16px;display:flex;flex-wrap:wrap;align-items:center;gap:10px;font-size:.82rem;color:var(--gm);box-shadow:0 2px 8px rgba(0,0,0,.04)}
+.modo-badge{background:var(--negro);color:#fff;border-radius:4px;padding:3px 10px;font-size:.72rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.nivel-badge{background:var(--rojo);color:#fff;border-radius:4px;padding:3px 10px;font-size:.72rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.cats-bar{flex:1;display:flex;flex-wrap:wrap;gap:4px}
+.ctag{background:#fff0f2;color:var(--rojo);border:1px solid #f5c6ce;border-radius:4px;padding:2px 8px;font-size:.72rem;font-weight:700}
+
+.stats-bar{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+.stat{background:var(--bl);border:1px solid var(--borde);border-radius:8px;padding:10px 18px;text-align:center;flex:1;min-width:80px;box-shadow:0 2px 6px rgba(0,0,0,.04)}
+.stat-n{font-family:'Playfair Display',serif;font-size:1.55rem;font-weight:900;color:var(--rojo);line-height:1}
+.stat-l{font-size:.69rem;color:var(--gm);text-transform:uppercase;letter-spacing:.07em;margin-top:2px}
+
+/* tarjeta */
+.tarjeta{background:var(--bl);border-radius:var(--r);box-shadow:var(--sh);overflow:hidden;transition:opacity .3s ease,transform .3s ease}
+.tarjeta.saliendo{opacity:0;transform:translateY(10px)}
+.t-head{background:var(--negro);color:#fff;padding:18px 24px}
+.t-label{font-size:.67rem;letter-spacing:.12em;text-transform:uppercase;color:var(--rojo);font-weight:700;margin-bottom:4px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.t-label-cat{background:rgba(200,16,46,.28);border-radius:3px;padding:1px 7px;font-size:.63rem}
+.t-label-dif{border-radius:3px;padding:1px 7px;font-size:.63rem;font-weight:700}
+.dif-medio{background:rgba(186,117,23,.35)}
+.dif-alto{background:rgba(200,16,46,.45)}
+.dif-experto{background:rgba(83,74,183,.4)}
+.t-titulo{font-family:'Playfair Display',serif;font-size:1.35rem;font-weight:700;line-height:1.25}
+
+.sec{padding:18px 24px;border-bottom:1px solid var(--borde)}
+.sec:last-child{border-bottom:none}
+.sec-t{font-size:.67rem;font-weight:700;letter-spacing:.11em;text-transform:uppercase;color:var(--gm);margin-bottom:9px}
+.expl{font-size:.97rem;line-height:1.72;color:#2c2c2c}
+
+.ej-lista{list-style:none;display:flex;flex-direction:column;gap:6px}
+.ej-lista li{display:flex;align-items:baseline;gap:9px;font-size:.94rem;line-height:1.5}
+.ej-lista li::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--rojo);flex-shrink:0;margin-top:2px}
+
+/* nota adicional */
+.nota{background:#fff8f0;border-left:3px solid #ba7517;border-radius:0 6px 6px 0;padding:9px 13px;font-size:.82rem;color:#5a3d08;line-height:1.6;margin-top:10px}
+
+.ejerc{margin-bottom:15px}
+.ejerc:last-child{margin-bottom:0}
+.ejerc-n{font-size:.67rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--rojo);margin-bottom:4px}
+.ejerc-txt{font-size:.97rem;line-height:1.7;display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 5px}
+.hueco{display:inline-block;border:none;border-bottom:2px solid var(--negro);background:transparent;font-family:inherit;font-size:.97rem;color:var(--negro);padding:0 4px;min-width:88px;outline:none;text-align:center;transition:border-color .18s}
+.hueco:focus{border-bottom-color:var(--rojo)}
+.hueco.ok{border-bottom-color:var(--ok);color:var(--ok);background:var(--ok-bg);border-radius:4px 4px 0 0}
+.hueco.ko{border-bottom-color:var(--err);color:var(--err);background:var(--err-bg);border-radius:4px 4px 0 0}
+.fb{font-size:.79rem;margin-top:3px;min-height:17px;font-style:italic}
+.fb.ok{color:var(--ok)}.fb.ko{color:var(--err)}
+
+.botones{display:flex;flex-wrap:wrap;gap:9px;padding:18px 24px;background:var(--gc);border-top:1px solid var(--borde)}
+.marcador{margin-top:14px;padding:13px 17px;border-radius:var(--r);font-size:.94rem;font-weight:700;display:none}
+.marcador.vis{display:block}
+.marcador.perf{background:var(--ok-bg);color:var(--ok)}
+.marcador.parc{background:#fff8e1;color:#7a5a00}
+.marcador.fallo{background:var(--err-bg);color:var(--err)}
+
+@keyframes fi{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
+footer{background:var(--negro);color:#aaa;text-align:center;padding:13px;font-size:.77rem}
+footer strong{color:var(--rojo)}
+
+@media(max-width:600px){
+  header{flex-direction:column;text-align:center;gap:8px}
+  header img{height:52px}
+  .ht h1{font-size:1.15rem}
+  .t-head,.sec,.botones{padding:13px 15px}
+  .t-titulo{font-size:1.15rem}
+  .botones{flex-direction:column}
+  .btn{width:100%;text-align:center}
+  .sel-actions{flex-direction:column;align-items:stretch}
+  .subcat{min-width:130px}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <img src="data:image/jpeg;base64,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AAAADkIDzXDBYlLCQQgCQAAAAAAAAAAAAAAAAAABWAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABD0AQAAwAAAAAAAAAoAAA8YgAA8IgAAAAAAAAAAACgBL7CHABA1UAAQfHQoHqMsICdFsAAAAAAAAAADhSgAMADeoAjsICCAAMPcABMavcAAAAAAAAAAABAACAAMUgIAd1PkCMMAARwAABVJJoIAAAAAAAAABTzzAAMACmm/i2oGEkAADMAAREAAEoAAAAAAAAABAAAQQMEBoegAAWTMYsAyvwRoFsA5kAAAAAAAAAAAAACDACFRMYACfYBBNGIACEEBMEEoAAAAAAAAASCgAwAAwAQgACwAhCwQByQwgRQAwgQAAAAAAAABQhQwiQDiihwDRwAwCyhyjhAwihzhQQAAAAAAAABAQAyBTxiAwAATTDQDgAwDwTAwDAwiwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD//aAAwDAQACAAMAAAAQ88888888888888888882FW888888888888888888888888888888888888JlY88888888888888888888888888888888888tZr888888888888888888888888888888888888Rj888888888888888888888888888888k88V8888808MC08E88888888888888888888888aIwTgg8888w5rKwN88888888888888888888888jM8a88s8088TcD8z88888888888888888888888ndswwFUo88YGwlD288888888888888888888888n6j8Qg80s04rsdrf88888888888888888888888OZ8tj0o8888mTR8W88888888888888888888888ks8xy8888I845/8u88888888888888888888888enL2888888c8p88088888888888888888888888K11occ8sM888tAAP88888888888888888888888yigA48888880848h88888888888888888888888DfyUgsM88BW+89NH88888888888888888888888CG148D898ij788Bg88888888888888888888888QSUy/88wWY8J48cd88888888888888888888888QMwyK88+mp88MwwG8888888888888888888l4888888888888888888888888888888888888oP88xx8888x0888k5U88qg888jxo8888888888soc8ivJQbAsKv8APCb5lgE4dAwip9wvPPPPPPPPPPALFPK1/PsfCpQPIs/K5twPIqwvvPPPPPPPPPPPKJKCPK60sfAZUTPIQ/PKHvPKkABFbPPPPPPPPPPOAAGNK1/AI3RQOWAgPPPPPPPIvPMEvPPPPPPPPOGPPKPKwdQCL/PBgl8B+FOsOBiEfC0/PPPPPPPPLHPPPLOlHpQ5fPJ5/I2ugUU6+fIqd6/PPPPPPPPLHEMNMOMPMPPPKMPLNEPKNPNMKPPPOPPPPPPPPPPNPFEKMIBLNPPIKFPFKLIJHBBJJJKFPPPPPPPPPPKDHDKKIFLJPCIDFPEINLJAPAHBEIFPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP/8QANxEAAgECBAMFBAkFAQAAAAAAAQIDABEEEBIhEzFBBSIyQFEUIDBhBhVCUHGBkbHwI4ChweHR/9oACAECAQE/APJyPoW9M7NzqCRtWk/cuJbcLQHQVDFoFzz+5XbU16gi094/cwjUdPPqjN4RfMowXURt8DjR6+HcavTrUkscI1SMAPnnxo9fDuNXp1/TzHZKjhset6mULIwHqcsQi+x2+Q+Akr/W+rrrt+V7ftX0pZrxL03/ANV2WxfBxs3OwyaV/rfV112/K9v28xh8U+Hvo61z3yfFyNEITyHwB2XAMV7WPF/i/K9Y/s6LHKFk2t6VHGsahF2AyPZUJxftf2vTa1+V/wAfMTyMrALTuRHqrDuWWxyxEjKQBSnUoPvCU8W3TJ20qTWHkLXBritxbdPMTRFyCKZLppFQRlBvlPEXIIpRpAHvcE8TV0yZdS2qCIxg3rg" alt="Logo Ábacos"/>
+  <div class="ht">
+    <h1><span>Ábacos</span> Centro de Estudios</h1>
+    <p>Ortografía avanzada · Preparación Magisterio</p>
+    <span class="nivel">Nivel universitario</span>
+  </div>
+</header>
+
+<main>
+
+<!-- PANTALLA SELECCIÓN -->
+<div id="ps">
+  <div class="ps-head">
+    <h2>Selecciona los temas a practicar</h2>
+    <p>Ortografía de nivel universitario orientada a las pruebas de acceso al cuerpo de maestros. Selecciona categorías o activa el modo aleatorio completo.</p>
+  </div>
+  <div class="sel-actions">
+    <div class="sel-info" id="sel-info">Ninguna categoría seleccionada</div>
+    <button class="btn btn-outline" onclick="selTodo()">☑ Todo</button>
+    <button class="btn btn-outline" onclick="deselTodo()">☐ Ninguno</button>
+    <button class="btn btn-negro" onclick="iniciarAleatorio()">🎲 Modo aleatorio</button>
+    <button class="btn btn-rojo" id="btn-emp" style="display:none" onclick="iniciarSeleccion()">▶ Empezar</button>
+  </div>
+  <div id="bloques-container"></div>
+</div>
+
+<!-- PANTALLA PRÁCTICA -->
+<div id="pp">
+  <div class="sesion-bar">
+    <span class="modo-badge" id="modo-badge">ALEATORIO</span>
+    <span class="nivel-badge">MAGISTERIO</span>
+    <div class="cats-bar" id="cats-bar"></div>
+    <button class="btn btn-outline" style="padding:6px 13px;font-size:.79rem" onclick="volverPanel()">← Temas</button>
+  </div>
+  <div class="stats-bar">
+    <div class="stat"><div class="stat-n" id="st-tot">0</div><div class="stat-l">Intentos</div></div>
+    <div class="stat"><div class="stat-n" id="st-ok" style="color:var(--ok)">0</div><div class="stat-l">Correctos</div></div>
+    <div class="stat"><div class="stat-n" id="st-pct">—</div><div class="stat-l">Precisión</div></div>
+    <div class="stat"><div class="stat-n" id="st-reg">0</div><div class="stat-l">Reglas vistas</div></div>
+  </div>
+  <div class="tarjeta" id="tarjeta">
+    <div class="t-head">
+      <div class="t-label">
+        Regla ortográfica · nivel magisterio
+        <span class="t-label-cat" id="lbl-cat"></span>
+        <span class="t-label-dif" id="lbl-dif"></span>
+      </div>
+      <div class="t-titulo" id="t-titulo"></div>
+    </div>
+    <div class="sec"><div class="sec-t">Explicación</div><div class="expl" id="t-expl"></div><div id="t-nota"></div></div>
+    <div class="sec"><div class="sec-t">Ejemplos y contraejemplos</div><ul class="ej-lista" id="t-ejs"></ul></div>
+    <div class="sec"><div class="sec-t">Ejercicios: completa el hueco</div><div id="t-ejercs"></div></div>
+    <div class="botones">
+      <button class="btn btn-rojo" onclick="comprobar()">✓ Comprobar</button>
+      <button class="btn btn-negro" onclick="nuevaRegla()">↻ Nueva regla</button>
+      <button class="btn btn-outline" onclick="volverPanel()">⊞ Temas</button>
+    </div>
+  </div>
+  <div class="marcador" id="marcador"></div>
+</div>
+
+</main>
+<footer><strong>Ábacos Centro de Estudios</strong> · Preparación para el acceso al cuerpo de maestros</footer>
+
+<script>
+/* ══ ÍNDICE DE DOS NIVELES ══ */
+const BLOQUES = [
+  {
+    id:'acentuacion', nombre:'Acentuación avanzada', icono:'´',
+    desc:'Casos complejos, hiatos, extranjerismos y compuestos',
+    cats:[
+      {id:'ac_hiatos_complejos', nombre:'Hiatos complejos', desc:'Vocal cerrada tónica, verbos en -uar/-iar'},
+      {id:'ac_compuestos',       nombre:'Compuestos y enclíticos', desc:'Adverbios -mente, pronombres pospuestos'},
+      {id:'ac_extranjerismos',   nombre:'Extranjerismos y latinismos', desc:'Voces latinas, anglicismos adaptados'},
+      {id:'ac_interrogativos',   nombre:'Interrogativos y exclamativos', desc:'Qué/que, cómo/como, cuándo/cuando…'},
+    ]
+  },
+  {
+    id:'mayusculas', nombre:'Mayúsculas: casos normativos', icono:'M',
+    desc:'Instituciones, cargos, disciplinas, gentilicios y obras',
+    cats:[
+      {id:'may_instituciones', nombre:'Instituciones y organismos', desc:'Estado, Gobierno, Ministerio, UE…'},
+      {id:'may_disciplinas',   nombre:'Asignaturas y disciplinas', desc:'Matemáticas vs matemáticas'},
+      {id:'may_cargos',        nombre:'Cargos y tratamientos', desc:'Rey, presidente, don, fray…'},
+      {id:'may_obras',         nombre:'Títulos de obras', desc:'Solo primera palabra y nombres propios'},
+    ]
+  },
+  {
+    id:'puntuacion_adv', nombre:'Puntuación avanzada', icono:'.,',
+    desc:'Usos normativos del punto, coma, puntos suspensivos y paréntesis',
+    cats:[
+      {id:'pun_coma_adv',   nombre:'Coma: casos difíciles', desc:'Oraciones de relativo, modo, causa…'},
+      {id:'pun_ptocoma_adv',nombre:'Punto y coma avanzado', desc:'Adversativas, enumeraciones complejas'},
+      {id:'pun_comillas',   nombre:'Comillas y cursiva', desc:'Citas, usos especiales, ironía'},
+      {id:'pun_parentesis', nombre:'Paréntesis y raya', desc:'Incisos, aclaraciones, diálogos'},
+    ]
+  },
+  {
+    id:'homofonos_adv', nombre:'Homófonos y parónimos', icono:'≈',
+    desc:'Confusiones habituales en el examen de magisterio',
+    cats:[
+      {id:'hp_grupos_vocal', nombre:'Grupos vocálicos problemáticos', desc:'A ver/haber, hay/ahí/ay, oh/o/ho'},
+      {id:'hp_porqué',       nombre:'Porqué / por qué / porque / por que', desc:'Las cuatro formas en contexto'},
+      {id:'hp_conj_adv',     nombre:'Conjunciones vs adverbios', desc:'Sino/si no, también/tan bien, demás/de más'},
+      {id:'hp_verbos',       nombre:'Parónimos verbales', desc:'Coser/cocer, rallar/rayar, votar/botar…'},
+    ]
+  },
+  {
+    id:'prefijos_sufijos', nombre:'Prefijos, sufijos y cultismos', icono:'±',
+    desc:'Ortografía de morfemas derivativos de origen culto',
+    cats:[
+      {id:'pref_griegos',  nombre:'Prefijos griegos', desc:'Pseudo-, hiper-, hipo-, anti-, para-…'},
+      {id:'pref_latinos',  nombre:'Prefijos latinos', desc:'Sub-, super-, inter-, trans-, circum-…'},
+      {id:'suf_cultismos', nombre:'Sufijos cultos y -mente', desc:'-ción/-sión/-xión, -ismo, -ista, -oso'},
+      {id:'cult_latinismos',nombre:'Latinismos y locuciones', desc:'In situ, a priori, motu proprio, ipso facto…'},
+    ]
+  },
+  {
+    id:'signos_especiales', nombre:'Abreviaturas, siglas y números', icono:'№',
+    desc:'Normativa RAE sobre formas reducidas y cifras',
+    cats:[
+      {id:'abrev_reglas',  nombre:'Abreviaturas', desc:'Punto, mayúscula, plural, género'},
+      {id:'siglas_acronimos',nombre:'Siglas y acrónimos', desc:'ONU, OTAN, ovni, láser, radar'},
+      {id:'num_ortografia',nombre:'Números en textos', desc:'Cifras vs letras, ordinales, fracciones'},
+    ]
+  },
+  {
+    id:'norma_ortografias', nombre:'Norma y variantes del español', icono:'ES',
+    desc:'Seseo, ceceo, yeísmo, voseo y diversidad normativa',
+    cats:[
+      {id:'var_seseo_ceceo', nombre:'Seseo y ceceo', desc:'Uso normativo en Hispanoamérica y Andalucía'},
+      {id:'var_yeismo',      nombre:'Yeísmo', desc:'LL/Y en el español actual'},
+      {id:'var_normativa',   nombre:'Ortografía normativa RAE-ASALE', desc:'Edición vigente del Diccionario panhispánico'},
+    ]
+  },
+];
+
+/* ══ BANCO DE REGLAS — nivel magisterio ══ */
+const REGLAS = [
+
+  /* ── HIATOS COMPLEJOS ── */
+  { cat:'ac_hiatos_complejos', dif:'alto',
+    titulo:'Hiatos en verbos terminados en -uar e -iar',
+    explicacion:'En los verbos de la segunda y tercera conjugación terminados en -uar e -iar, las formas del presente de indicativo, subjuntivo e imperativo llevan tilde en la vocal cerrada (i, u) cuando esta es tónica y forma hiato con la vocal siguiente. La clave está en la sílaba de mayor intensidad.',
+    nota:'Excepción importante: los verbos cambiar, copiar, anunciar, apreciar y similares (con el grupo -iar sin hiato) NO llevan tilde: cambio, copias, anuncia.',
+    ejemplos:[
+      'actuar → actúo, actúas, actúa, actúen (hiato: la u es tónica)',
+      'confiar → confío, confías, confía, confíen (hiato: la i es tónica)',
+      'cambiar → cambio, cambias, cambia (diptongo: sin tilde)',
+    ],
+    ejercicios:[
+      {partes:['El alumno ', ' muy bien en el examen.'], hueco:'act_a', respuesta:'actúa'},
+      {partes:['Ella ', ' en sus propias fuerzas.'], hueco:'conf_a', respuesta:'confía'},
+      {partes:['El río ', ' por el llano.'], hueco:'contin_a', respuesta:'continúa'},
+      {partes:['El profesor ', ' la nota final.'], hueco:'eval_a', respuesta:'evalúa'},
+    ]
+  },
+  { cat:'ac_hiatos_complejos', dif:'experto',
+    titulo:'Tilde en hiatos con vocal cerrada: casos límite',
+    explicacion:'Cuando la vocal cerrada i o u va seguida o precedida de vocal abierta (a, e, o) y la cerrada es tónica, la tilde es obligatoria aunque la palabra sea llana y acabe en n, s o vocal. Esta norma prevalece sobre las reglas generales.',
+    nota:'Atención al plural: país → países (llana terminada en s: sin tilde por regla general, PERO lleva tilde por el hiato). Raíz → raíces. La regla del hiato siempre gana.',
+    ejemplos:[
+      'país, maíz, baúl, raíz → vocal cerrada tónica en hiato: tilde obligatoria',
+      'oído, caída, reír, freír → hiato verbal o nominal con tilde',
+      'reino, pausa, deuda → diptongos: sin tilde (vocal cerrada átona)',
+    ],
+    ejercicios:[
+      {partes:['Viajó por todo el ', ' con su familia.'], hueco:'pa_s', respuesta:'país'},
+      {partes:['El médico analizó el ', ' del paciente.'], hueco:'o_do', respuesta:'oído'},
+      {partes:['La ', ' del problema era compleja.'], hueco:'ra_z', respuesta:'raíz'},
+      {partes:['La fruta está en el ', '.'], hueco:'ba_l', respuesta:'baúl'},
+    ]
+  },
+
+  /* ── COMPUESTOS Y ENCLÍTICOS ── */
+  { cat:'ac_compuestos', dif:'alto',
+    titulo:'Adverbios en -mente: conservan la tilde del adjetivo base',
+    explicacion:'Los adverbios formados con el sufijo -mente conservan la tilde del adjetivo del que derivan, si este la llevaba. El motivo es que la palabra compuesta tiene en realidad dos acentos: el del adjetivo y el del sufijo. El adjetivo no pierde su tonicidad.',
+    nota:'Si el adjetivo base no lleva tilde (tranquilo, grave, libre), el adverbio tampoco la lleva: tranquilamente, gravemente, libremente.',
+    ejemplos:[
+      'rápido → rápidamente · ágil → ágilmente · fácil → fácilmente',
+      'hábil → hábilmente · tímido → tímidamente · débil → débilmente',
+      'tranquilo → tranquilamente (sin tilde) · libre → libremente (sin tilde)',
+    ],
+    ejercicios:[
+      {partes:['El orador se expresó ', '.'], hueco:'elocuente_ente', respuesta:'elocuentemente'},
+      {partes:['Resolvió el problema ', '.'], hueco:'r_pidamente', respuesta:'rápidamente'},
+      {partes:['Actuó de forma ', ' e inteligente.'], hueco:'h_bilmente', respuesta:'hábilmente'},
+      {partes:['La situación empeoró ', '.'], hueco:'not_blemente', respuesta:'notablemente'},
+    ]
+  },
+  { cat:'ac_compuestos', dif:'experto',
+    titulo:'Formas verbales con pronombres enclíticos: sobreesdrújulas',
+    explicacion:'Cuando a una forma verbal se le añaden uno o dos pronombres átonos pospuestos (enclíticos), la palabra resultante debe acentuarse según las reglas generales aplicadas al conjunto. Si el resultado es esdrújula o sobreesdrújula, lleva tilde obligatoriamente.',
+    nota:'Si el verbo ya llevaba tilde (dé, sé, dí), al añadir pronombres puede cambiar: dé → dénmelo (sobreesdrújula). Si el verbo sin pronombre era llana, con el pronombre puede ser esdrújula y necesitar tilde.',
+    ejemplos:[
+      'di + me → dime (llana en -e, sin tilde)',
+      'da + me + lo → dámelo (esdrújula, con tilde)',
+      'cuenta + me + lo → cuéntamelo (sobreesdrújula, con tilde)',
+    ],
+    ejercicios:[
+      {partes:['Si sabes la respuesta, ', '.'], hueco:'d_mela', respuesta:'dímela'},
+      {partes:['La historia es interesante; ', '.'], hueco:'cu_ntamela', respuesta:'cuéntamela'},
+      {partes:['¿Puedes ', ' los datos de hoy?'], hueco:'envi_rmelos', respuesta:'enviármelos'},
+      {partes:['Los documentos ya están; ', '.'], hueco:'tr_emelos', respuesta:'tráemelos'},
+    ]
+  },
+
+  /* ── EXTRANJERISMOS ── */
+  { cat:'ac_extranjerismos', dif:'alto',
+    titulo:'Voces latinas en español: con o sin tilde',
+    explicacion:'Las palabras y expresiones latinas ya integradas en el español se acentúan conforme a las reglas del español. Las locuciones latinas no adaptadas (usadas en cursiva) no llevan tilde. La RAE recomienda distinguir entre latinismos adaptados (con tilde) y los usados como extranjerismos (sin tilde, en cursiva).',
+    nota:'Locuciones latinas más frecuentes en textos académicos: a priori, a posteriori, in situ, motu proprio, grosso modo, ipso facto, ad hoc, per se, de facto, sine qua non.',
+    ejemplos:[
+      'déficit, hábitat, médium, ítem, réquiem → latinismos adaptados con tilde',
+      'in situ, a priori, motu proprio → en cursiva, sin tilde (no adaptados)',
+      'memorándum/memorando → la forma adaptada sí lleva tilde',
+    ],
+    ejercicios:[
+      {partes:['El presupuesto ha acumulado un gran ', '.'], hueco:'d_ficit', respuesta:'déficit'},
+      {partes:['El loro vive en su ', ' natural.'], hueco:'h_bitat', respuesta:'hábitat'},
+      {partes:['Hay que analizar cada ', ' de la lista.'], hueco:'_tem', respuesta:'ítem'},
+      {partes:['El informe incluía un ', ' de tres páginas.'], hueco:'memorán_um', respuesta:'memorándum'},
+    ]
+  },
+  { cat:'ac_extranjerismos', dif:'experto',
+    titulo:'Extranjerismos adaptados: criterios de acentuación',
+    explicacion:'Los préstamos de otras lenguas que se han adaptado al español deben acentuarse según las reglas generales. Si la pronunciación española sitúa el acento en una sílaba que no corresponde a las reglas, se añade tilde. Los no adaptados se escriben en cursiva y sin tilde.',
+    nota:'Casos especiales: fútbol (esdrújula), béisbol (llana en -l, con tilde), chándal (llana en -l, con tilde), máster (llana en -r, con tilde), esnórquel (esdrújula).',
+    ejemplos:[
+      'fútbol, béisbol, chándal, máster, esnórquel → extranjerismos adaptados con tilde',
+      'tour, marketing, ballet, jazz → no adaptados: sin tilde, en cursiva',
+      'mitin (del inglés meeting) → adaptado, llano en -n, sin tilde',
+    ],
+    ejercicios:[
+      {partes:['El partido de ', ' terminó en empate.'], hueco:'f_tbol', respuesta:'fútbol'},
+      {partes:['Hizo un ', ' en Administración de Empresas.'], hueco:'m_ster', respuesta:'máster'},
+      {partes:['El atleta llevaba un ', ' azul.'], hueco:'ch_ndal', respuesta:'chándal'},
+      {partes:['El equipo juega al ', ' en verano.'], hueco:'b_isbol', respuesta:'béisbol'},
+    ]
+  },
+
+  /* ── INTERROGATIVOS ── */
+  { cat:'ac_interrogativos', dif:'medio',
+    titulo:'Qué, quién, cuál, cómo, cuándo, dónde, cuánto: tilde diacrítica',
+    explicacion:'Estos pronombres y adverbios llevan tilde cuando introducen oraciones interrogativas o exclamativas directas o indirectas, y cuando tienen valor enfático o exclamativo. Sin tilde funcionan como relativos o conjunciones.',
+    nota:'Truco para distinguirlos: si puedes sustituir el relativo sin tilde por "el cual / la cual", es relativo (sin tilde). Si no puedes hacer esa sustitución porque tiene valor interrogativo o exclamativo, lleva tilde.',
+    ejemplos:[
+      '¿Qué hora es? / No sé qué hora es → interrogativo directo e indirecto: con tilde',
+      'El libro que compré / la persona que vino → relativo: sin tilde',
+      '¡Cómo ha crecido! / Hazlo como quieras → exclamativo vs relativo',
+    ],
+    ejercicios:[
+      {partes:['No entiendo ', ' llegaste tan tarde.'], hueco:'c_mo', respuesta:'cómo'},
+      {partes:['El lugar ', ' nació es muy bonito.'], hueco:'_onde', respuesta:'donde'},
+      {partes:['¡', ' bien has explicado el tema!'], hueco:'Qu_', respuesta:'Qué'},
+      {partes:['Preguntó ', ' personas asistirían.'], hueco:'cu_ntas', respuesta:'cuántas'},
+    ]
+  },
+
+  /* ── MAYÚSCULAS: INSTITUCIONES ── */
+  { cat:'may_instituciones', dif:'alto',
+    titulo:'Instituciones, organismos y documentos oficiales',
+    explicacion:'Se escriben con mayúscula inicial los nombres de instituciones, organismos, departamentos y documentos únicos e irrepetibles: Estado (como organización política), Gobierno, Constitución, Parlamento, Tribunal Supremo, Ministerio de Educación.',
+    nota:'Cuando se usan en sentido genérico o descriptivo, van en minúscula: "el gobierno de un país democrático" (genérico) frente a "el Gobierno aprobó el decreto" (referencia a uno concreto). Los artículos y preposiciones dentro del nombre van en minúscula.',
+    ejemplos:[
+      'la Constitución española, el Tribunal Constitucional, el Congreso de los Diputados',
+      'el Ministerio de Educación, la Unión Europea, la Real Academia Española',
+      'el gobierno de muchos países (genérico, minúscula) / el Gobierno ha decidido (concreto)',
+    ],
+    ejercicios:[
+      {partes:['La ', ' española fue aprobada en 1978.'], hueco:'_onstitución', respuesta:'Constitución'},
+      {partes:['El fallo del ', ' fue unánime.'], hueco:'_ribunal Supremo', respuesta:'Tribunal Supremo'},
+      {partes:['La ', ' cuenta con 27 estados miembros.'], hueco:'_nión Europea', respuesta:'Unión Europea'},
+      {partes:['El ', ' aprobó el nuevo presupuesto.'], hueco:'_ongreso', respuesta:'Congreso'},
+    ]
+  },
+  { cat:'may_instituciones', dif:'experto',
+    titulo:'Estado, Administración, Iglesia: usos mayúsculos y minúsculos',
+    explicacion:'Palabras como Estado, Administración, Iglesia, Ejército, Corona llevan mayúscula cuando se refieren a una institución concreta y única. En sentido genérico, descriptivo o metafórico, van en minúscula.',
+    nota:'Estado (organización política soberana) vs estado (situación, condición). Administración (conjunto de órganos del Estado) vs administración (gestión). Iglesia (comunidad cristiana o edificio concreto) vs iglesia (edificio genérico).',
+    ejemplos:[
+      'El Estado garantiza los derechos fundamentales (institución) / El estado de la carretera es malo',
+      'La Iglesia católica tiene sede en Roma / Visitaron una iglesia románica',
+      'La Administración pública debe ser eficaz / La administración del tiempo es importante',
+    ],
+    ejercicios:[
+      {partes:['El ', ' de ánimo del candidato era óptimo.'], hueco:'_stado', respuesta:'estado'},
+      {partes:['El ', ' aprobó nuevas medidas de protección.'], hueco:'_stado', respuesta:'Estado'},
+      {partes:['La ', ' medieval tenía gran influencia política.'], hueco:'_glesia', respuesta:'Iglesia'},
+      {partes:['El turista visitó una ', ' del siglo XII.'], hueco:'_glesia', respuesta:'iglesia'},
+    ]
+  },
+
+  /* ── MAYÚSCULAS: DISCIPLINAS ── */
+  { cat:'may_disciplinas', dif:'medio',
+    titulo:'Asignaturas, ciencias y disciplinas: mayúscula o minúscula',
+    explicacion:'Los nombres de las disciplinas, ciencias y materias de estudio se escriben en minúscula cuando se usan en sentido genérico. Sin embargo, cuando se refieren al nombre oficial de una asignatura, curso o departamento universitario concreto, pueden ir en mayúscula.',
+    nota:'Estudia matemáticas (disciplina genérica) / Se matriculó en Matemáticas II (asignatura oficial). La lengua española, la historia de España (genérico) / Lengua Española e Historia de España (nombre oficial de asignatura).',
+    ejemplos:[
+      'Le gustan las matemáticas y la física (genérico: minúscula)',
+      'Aprobó Matemáticas II y Física Cuántica (nombre oficial de asignatura)',
+      'Un médico estudia medicina / Facultad de Medicina (institución)',
+    ],
+    ejercicios:[
+      {partes:['Le fascina la ', ' desde pequeño.'], hueco:'_istoria', respuesta:'historia'},
+      {partes:['Se matriculó en ', ' General II.'], hueco:'_istoria', respuesta:'Historia'},
+      {partes:['El maestro imparte ', ' en primaria.'], hueco:'_engua', respuesta:'lengua'},
+      {partes:['El departamento de ', ' es el más grande.'], hueco:'_engua Española', respuesta:'Lengua Española'},
+    ]
+  },
+
+  /* ── MAYÚSCULAS: CARGOS ── */
+  { cat:'may_cargos', dif:'alto',
+    titulo:'Cargos, títulos y tratamientos: norma actual RAE',
+    explicacion:'Según la norma actual de la RAE, los nombres de cargos, dignidades y títulos se escriben en minúscula: rey, presidente, ministro, papa, director, catedrático. Solo se admite la mayúscula en documentos oficiales, actas y textos protocolarios cuando aparecen solos, sin el nombre de la persona.',
+    nota:'Don / doña se escriben siempre en minúscula (don Juan, doña Ana). Fray, sor, san, santo también en minúscula. Los tratamientos de cortesía abreviados sí van con mayúscula: Sr., Sra., Dr., Excmo.',
+    ejemplos:[
+      'El rey inauguró la exposición / el presidente del Gobierno compareció',
+      'El papa Francisco / el ministro de Sanidad / el director del centro',
+      'don Miguel de Cervantes / fray Luis de León / san Juan de la Cruz',
+    ],
+    ejercicios:[
+      {partes:['Ayer habló el ', ' ante el Congreso.'], hueco:'_residente', respuesta:'presidente'},
+      {partes:['El ', ' Juan Carlos I abdicó en 2014.'], hueco:'_ey', respuesta:'rey'},
+      {partes:['', ' Antonio García impartió la conferencia.'], hueco:'_on', respuesta:'don'},
+      {partes:['El ', ' de Educación anunció reformas.'], hueco:'_inistro', respuesta:'ministro'},
+    ]
+  },
+
+  /* ── MAYÚSCULAS: OBRAS ── */
+  { cat:'may_obras', dif:'medio',
+    titulo:'Títulos de obras: solo la primera palabra',
+    explicacion:'En los títulos de libros, películas, canciones, cuadros y obras en general, solo se escribe con mayúscula la primera palabra y los nombres propios que contenga. El resto de palabras van en minúscula, a diferencia del inglés.',
+    nota:'En inglés se escriben con mayúscula todas las palabras principales del título (The Lord of the Rings). En español: El señor de los anillos. Este contraste es frecuente fuente de error en textos académicos.',
+    ejemplos:[
+      'Don Quijote de la Mancha (nombre propio incluido) / La vida es sueño',
+      'Cien años de soledad / El árbol de la ciencia / La regenta',
+      'La Gioconda (nombre propio) / Las meninas / El guernica (nombre propio)',
+    ],
+    ejercicios:[
+      {partes:['Leyó ', ' de García Márquez.'], hueco:'_ien años de soledad', respuesta:'Cien años de soledad'},
+      {partes:['La película favorita era ', '.'], hueco:'_l señor de los anillos', respuesta:'El señor de los anillos'},
+      {partes:['Estudió la obra ', ' de Calderón.'], hueco:'_a vida es sueño', respuesta:'La vida es sueño'},
+      {partes:['El cuadro ', ' está en el Prado.'], hueco:'_as meninas', respuesta:'Las meninas'},
+    ]
+  },
+
+  /* ── COMA AVANZADA ── */
+  { cat:'pun_coma_adv', dif:'alto',
+    titulo:'Coma en oraciones de relativo: explicativas vs especificativas',
+    explicacion:'Las oraciones de relativo especificativas (que delimitan el referente) NO van entre comas: "Los alumnos que aprobaron recibirán diploma" (solo los que aprobaron). Las explicativas (que añaden información accesoria) SÍ van entre comas: "Los alumnos, que aprobaron todos, recibirán diploma".',
+    nota:'Este es uno de los errores más frecuentes en textos académicos y uno de los más valorados en las pruebas de magisterio. Una coma mal puesta puede cambiar completamente el significado de la oración.',
+    ejemplos:[
+      'Los maestros que dominan la ortografía transmiten seguridad (especificativa: solo esos)',
+      'Los maestros, que dominan la ortografía, transmiten seguridad (explicativa: todos)',
+      'El informe que entregaste tiene errores (especificativa) / El informe, que entregaste ayer, tiene errores',
+    ],
+    ejercicios:[
+      {partes:['"Los candidatos', ' que superaron la fase oral', ' pasarán a la siguiente." → ¿coma?'], hueco:'coma o no', respuesta:'no'},
+      {partes:['"Mi hermana', ' que estudia magisterio', ' vive en Madrid." → ¿comas?'], hueco:'coma o no', respuesta:'sí'},
+      {partes:['"El libro', ' que te presté', ' está en la mesa." → ¿comas?'], hueco:'coma o no', respuesta:'no'},
+      {partes:['"El director', ' que conoce bien el centro', ' tomó la decisión." → ¿comas?'], hueco:'coma o no', respuesta:'sí'},
+    ]
+  },
+  { cat:'pun_coma_adv', dif:'experto',
+    titulo:'Coma y modo verbal: oraciones causales, finales y concesivas',
+    explicacion:'Las oraciones causales con "porque" pueden ir con o sin coma según su valor. Con coma, "porque" expresa causa explicativa (la coma la convierte en comentario): "No vino, porque estaba enfermo". Sin coma, "porque" expresa causa real: "No vino porque quiso sino porque debía".',
+    nota:'Las oraciones concesivas (aunque, a pesar de que) y finales (para que, a fin de que) cuando van delante del verbo principal suelen llevar coma: "Aunque llegó tarde, terminó el examen". Cuando van detrás, normalmente no.',
+    ejemplos:[
+      'No aprobó, porque no había estudiado (causa explicativa: comentario)',
+      'No aprobó porque no había estudiado sino por los nervios (causa real)',
+      'Aunque estaba cansado, terminó el trabajo / Terminó el trabajo aunque estaba cansado',
+    ],
+    ejercicios:[
+      {partes:['Aunque llovía mucho', ' salieron a pasear.'], hueco:'_', respuesta:','},
+      {partes:['Salieron a pasear aunque llovía mucho', ' sin coma.'], hueco:'sin _', respuesta:'sin coma'},
+      {partes:['No habló en clase', ' porque tenía miedo. → ¿coma?'], hueco:'_', respuesta:','},
+      {partes:['Para que todo salga bien', ' hay que prepararse.'], hueco:'_', respuesta:','},
+    ]
+  },
+
+  /* ── PUNTO Y COMA AVANZADO ── */
+  { cat:'pun_ptocoma_adv', dif:'alto',
+    titulo:'Punto y coma en enumeraciones complejas y adversativas',
+    explicacion:'El punto y coma se usa en enumeraciones cuyos elementos ya contienen comas internas (para evitar ambigüedad), y antes de conjunciones adversativas (pero, mas, aunque, sin embargo, no obstante) cuando las oraciones son largas y complejas.',
+    nota:'La distinción entre cuándo usar coma y cuándo punto y coma ante "pero" depende de la extensión y complejidad de los elementos. En oraciones cortas: coma. En oraciones largas con comas internas: punto y coma.',
+    ejemplos:[
+      'Asistieron: María, profesora; Juan, director; Ana, coordinadora → enumeración con aposiciones',
+      'Estudió durante toda la semana, repasando cada tema con cuidado; sin embargo, no aprobó',
+      'El proyecto era ambicioso, lleno de ideas creativas; pero faltaba financiación',
+    ],
+    ejercicios:[
+      {partes:['Participaron: Pedro García, de Madrid', ' Ana López, de Sevilla', ' Luis Ruiz, de Valencia.'], hueco:'_', respuesta:';'},
+      {partes:['Trabajó con esfuerzo durante meses', ' sin embargo, no obtuvo el puesto.'], hueco:'_', respuesta:';'},
+      {partes:['Era una propuesta original, bien argumentada y documentada', ' pero llegó tarde.'], hueco:'_', respuesta:';'},
+      {partes:['El aula estaba ordenada, limpia y ventilada', ' no obstante, el ambiente era tenso.'], hueco:'_', respuesta:';'},
+    ]
+  },
+
+  /* ── COMILLAS ── */
+  { cat:'pun_comillas', dif:'alto',
+    titulo:'Tipos de comillas y sus usos normativos',
+    explicacion:'En español se prefieren las comillas angulares «» (españolas) para el uso general. Las inglesas "" se usan dentro de un texto ya entrecomillado con «». Las simples \'\' se usan dentro de las inglesas o para destacar el significado de una palabra.',
+    nota:'Las palabras usadas en sentido irónico, en sentido especial o que se quieren destacar van entre comillas en texto impreso. En textos manuscritos se usan las comillas inglesas "" por ser más sencillas de escribir.',
+    ejemplos:[
+      '«El maestro dijo: "Estudiad"» → comillas angulares y, dentro, inglesas',
+      'El candidato era muy «listo» para el cargo (ironía)',
+      'La palabra \'ortografía\' deriva del griego → comillas simples para significado',
+    ],
+    ejercicios:[
+      {partes:['El informe concluía: ', 'La situación es grave', '.'], hueco:'«', respuesta:'«'},
+      {partes:['Era un ', 'experto', ' en la materia (con ironía).'], hueco:'«', respuesta:'«'},
+      {partes:['La voz ', 'pedagogía', ' procede del griego.'], hueco:'\'', respuesta:'\''},
+      {partes:['La obra ', 'Don Quijote', ' es la más leída.'], hueco:'«', respuesta:'«'},
+    ]
+  },
+
+  /* ── HOMÓFONOS ── */
+  { cat:'hp_grupos_vocal', dif:'medio',
+    titulo:'Haber / a ver / a haber: confusiones frecuentes',
+    explicacion:'"Haber" es el verbo auxiliar o el infinitivo: "va a haber reunión", "debe haber solución". "A ver" es la preposición a + el infinitivo ver: "voy a ver la película", "a ver qué pasa". Son completamente distintos: no se puede escribir "a haber" cuando se quiere decir "a ver".',
+    nota:'Test rápido: sustituye por "a mirar". Si tiene sentido → "a ver". Si no → "haber". Ejemplo: "Va a ver/haber] partido" → "Va a mirar partido" no tiene sentido → es "a haber".',
+    ejemplos:[
+      'Va a haber tormenta (verbo haber) / Voy a ver si queda café (prep. + ver)',
+      'Debe haber un error / A ver qué ha pasado aquí',
+      '¡A ver! Explícame eso bien / Tiene que haber una solución',
+    ],
+    ejercicios:[
+      {partes:['', ' si entiendo lo que me dices.'], hueco:'A _er', respuesta:'A ver'},
+      {partes:['Va ', ' mucha gente en el acto.'], hueco:'a _aber', respuesta:'a haber'},
+      {partes:['', ' cuántos candidatos se presentan.'], hueco:'A _er', respuesta:'A ver'},
+      {partes:['Tiene que ', ' una explicación lógica.'], hueco:'_aber', respuesta:'haber'},
+    ]
+  },
+  { cat:'hp_conj_adv', dif:'alto',
+    titulo:'Sino / si no · también / tan bien · demás / de más',
+    explicacion:'"Sino" (una palabra) es conjunción adversativa equivalente a "pero sí": "No es tonto, sino listo". "Si no" (dos palabras) equivale a "en caso de que no": "Si no estudias, no aprobarás". "También" (una palabra) = igualmente. "Tan bien" (dos palabras) = de tan buena manera.',
+    nota:'"Demás" (una palabra) = los otros, el resto: "los demás alumnos". "De más" (dos palabras) = en exceso, sobrante: "no hables de más", "tiene dinero de más". Igual con "porque/por que/porqué/por qué" estudiado en otra regla.',
+    ejemplos:[
+      'No llegó tarde, sino puntual / Si no llegas puntual, avisame',
+      'Ella también aprobó / Lo hizo tan bien que le dieron matrícula',
+      'Los demás esperaron fuera / No digas de más en la entrevista',
+    ],
+    ejercicios:[
+      {partes:['No es difícil ', ' diferente.'], hueco:'_ino', respuesta:'sino'},
+      {partes:['', ' estudias, suspenderás.'], hueco:'_i no', respuesta:'Si no'},
+      {partes:['El alumno ', ' demostró sus capacidades.'], hueco:'_ambién', respuesta:'también'},
+      {partes:['No hagas ', ' la tarea mínima.'], hueco:'_e más', respuesta:'de más'},
+    ]
+  },
+  { cat:'hp_verbos', dif:'alto',
+    titulo:'Parónimos verbales: coser/cocer, rallar/rayar, votar/botar',
+    explicacion:'Los parónimos verbales son pares de verbos que suenan similar pero tienen significado diferente. Coser (unir con hilo) / cocer (someter a calor). Rallar (desmenuzar con rallador) / rayar (trazar rayas, estropear). Votar (emitir voto) / botar (saltar, tirar).',
+    nota:'También: cazar (atrapar animales) / casar (contraer matrimonio). Hojear (pasar páginas) / ojear (mirar superficialmente). Hierba/hierva, ves/vez, halla/haya, bello/vello.',
+    ejemplos:[
+      'coser un botón (aguja e hilo) / cocer las patatas (hervir)',
+      'rallar el queso (rallador) / rayar el coche (arañar)',
+      'votar en las elecciones / botar la pelota (saltar)',
+    ],
+    ejercicios:[
+      {partes:['El chef decidió ', ' las patatas con sal.'], hueco:'_ocer', respuesta:'cocer'},
+      {partes:['La costurera fue a ', ' el dobladillo.'], hueco:'_oser', respuesta:'coser'},
+      {partes:['Hay que ', ' el queso para la pizza.'], hueco:'_allar', respuesta:'rallar'},
+      {partes:['No ', ' el cristal al pasar la maleta.'], hueco:'_ayes', respuesta:'rayes'},
+    ]
+  },
+
+  /* ── PREFIJOS GRIEGOS ── */
+  { cat:'pref_griegos', dif:'alto',
+    titulo:'Prefijos griegos: ortografía y significado',
+    explicacion:'Los prefijos de origen griego más frecuentes en el vocabulario académico y científico son: hiper- (exceso), hipo- (defecto), para- (junto a, semejante), meta- (más allá), proto- (primero), pseudo-/seudo- (falso), anti- (contra), auto- (por sí mismo), tele- (a distancia).',
+    nota:'Pseudo- y seudo- son igualmente correctas. La RAE acepta ambas. En cambio, *psicología se escribe solo con ps-: psicología, aunque coloquialmente se diga sicología. La Real Academia acepta sicología como variante pero recomienda la forma culta psicología.',
+    ejemplos:[
+      'hipertensión, hipoglucemia, hipócrita → hiper-/hipo-',
+      'paráfrasis, paradigma, paradoja → para-',
+      'metáfora, metamorfosis, metafísica → meta-',
+    ],
+    ejercicios:[
+      {partes:['La ', ' es un exceso de tensión arterial.'], hueco:'_ipertensión', respuesta:'hipertensión'},
+      {partes:['Una ', ' es una interpretación de un texto.'], hueco:'_aráfrasis', respuesta:'paráfrasis'},
+      {partes:['El uso del ', ' nombre es un fraude.'], hueco:'_seudo', respuesta:'seudo'},
+      {partes:['El ', ' es el precursor de la Internet moderna.'], hueco:'_rotoInternet', respuesta:'proto'},
+    ]
+  },
+  { cat:'pref_latinos', dif:'alto',
+    titulo:'Prefijos latinos: unión con la base (junto o separado)',
+    explicacion:'Los prefijos latinos (sub-, super-, inter-, trans-, extra-, circum-, vice-, ex-) se escriben unidos a la base cuando esta es una palabra simple. Se escriben separados (o con guion) cuando la base es un nombre propio, una sigla, un número o cuando se quiere marcar el límite morfológico.',
+    nota:'El prefijo ex- con significado "que fue y ya no es" se escribe separado: ex presidente, ex ministro. Pero exhalar, exhibir, excavar (con significado verbal distinto) van unidos. El prefijo anti- va siempre unido: antiinflamatorio, aunque la base empiece por i.',
+    ejemplos:[
+      'subrayar, suboficial, subdirector → sub- unido a base simple',
+      'ex presidente, ex directora → ex- separado cuando significa "que fue"',
+      'anti-OTAN, pro-europeo → con guion ante siglas y nombres propios',
+    ],
+    ejercicios:[
+      {partes:['El ', ' compareció ante los medios.'], hueco:'ex _inistro', respuesta:'ex ministro'},
+      {partes:['Tomó un medicamento ', '.'], hueco:'anti_nflamatorio', respuesta:'antiinflamatorio'},
+      {partes:['El técnico realizó el ', ' del informe.'], hueco:'_ubanálisis', respuesta:'subanálisis'},
+      {partes:['La organización se declaró ', '.'], hueco:'anti-_TAN', respuesta:'anti-OTAN'},
+    ]
+  },
+
+  /* ── SUFIJOS CULTOS ── */
+  { cat:'suf_cultismos', dif:'alto',
+    titulo:'Sufijos -ción / -sión / -xión / -cción: criterios de selección',
+    explicacion:'La elección entre estos sufijos depende de la base léxica. -ción: bases en -ar o en -tor/-to sin oclusiva final. -sión: bases en -der, -dir, -ter, -tir, -sar con -s en la raíz, o bases terminadas en -so/-sor. -xión: bases en -x (conexión, reflexión). -cción: bases en -ct- (acción de acto, dirección de directo).',
+    nota:'La forma -cción (con doble c) pronuncia ambas c en español estándar: ac-ción. Es un error frecuente escribirla con una sola c. Palabras como lección, elección, sección derivan de bases con -ct- (lectus, electus, sectus).',
+    ejemplos:[
+      'actuar→actuación, cantar→canción, crear→creación → -ción',
+      'decidir→decisión, comprender→comprensión, tener→tensión → -sión',
+      'conectar→conexión, reflexionar→reflexión → -xión  /  acto→acción, electo→elección → -cción',
+    ],
+    ejercicios:[
+      {partes:['La ', ' del candidato fue brillante.'], hueco:'actua_ión', respuesta:'actuación'},
+      {partes:['La ', ' fue tomada por mayoría.'], hueco:'deci_ión', respuesta:'decisión'},
+      {partes:['La red perdió la ', ' a internet.'], hueco:'cone_ión', respuesta:'conexión'},
+      {partes:['La ', ' del equipo fue clave.'], hueco:'dire_ión', respuesta:'dirección'},
+    ]
+  },
+  { cat:'cult_latinismos', dif:'experto',
+    titulo:'Locuciones latinas: uso y escritura correcta',
+    explicacion:'Las locuciones latinas no adaptadas se escriben en cursiva (o entre comillas en texto manuscrito) y sin tilde. Las más frecuentes en textos académicos: a priori (antes del análisis), a posteriori (tras el análisis), in situ (en el lugar), ad hoc (para esto), grosso modo (aproximadamente), per se (por sí mismo), de facto (de hecho).',
+    nota:'Errores frecuentes: *en situ (incorrecto: es in situ), *ad-hoc con guion (incorrecto), *a priori con tilde (incorrecto: las locuciones latinas no adaptadas no llevan tilde), *ipso-facto con guion (incorrecto).',
+    ejemplos:[
+      'La hipótesis se formuló a priori (antes de los datos)',
+      'La solución fue ad hoc para ese problema concreto',
+      'Se inspeccionó el lugar in situ por los técnicos',
+    ],
+    ejercicios:[
+      {partes:['La conclusión se obtuvo ', ' tras el experimento.'], hueco:'a _osteriori', respuesta:'a posteriori'},
+      {partes:['Diseñaron una solución ', ' para ese caso.'], hueco:'ad _oc', respuesta:'ad hoc'},
+      {partes:['El periodista estuvo ', ' durante el desastre.'], hueco:'in _itu', respuesta:'in situ'},
+      {partes:['La norma es válida ', ', sin excepciones.'], hueco:'per _e', respuesta:'per se'},
+    ]
+  },
+
+  /* ── ABREVIATURAS ── */
+  { cat:'abrev_reglas', dif:'alto',
+    titulo:'Abreviaturas: reglas de formación y uso',
+    explicacion:'Las abreviaturas se cierran con punto (pág., etc., núm., vol.) excepto las de las unidades de medida del Sistema Internacional (kg, m, km, l) y los puntos cardinales (N, S, E, O). El plural de las abreviaturas formadas con una letra se hace duplicando la letra: pp. (páginas), ff. (folios), ss. (siguientes).',
+    nota:'No confundir abreviatura (pág.), símbolo (kg) y sigla (ONU). Las abreviaturas llevan punto, los símbolos no. Algunas abreviaturas conservan la barra: c/ (calle), c/c (cuenta corriente). Los tratamientos de cortesía: Sr., Sra., Dr., Dra., D., D.ª',
+    ejemplos:[
+      'pág./págs., núm./núms., vol./vols. → abreviatura con punto y plural',
+      'kg, m, l, km → símbolos sin punto (no son abreviaturas)',
+      'D. / D.ª / Dr. / Dra. / Sr. / Sra. → tratamientos con mayúscula y punto',
+    ],
+    ejercicios:[
+      {partes:['Consulta las ', ' 45 y 46 del manual.'], hueco:'p_gs.', respuesta:'págs.'},
+      {partes:['El ', ' García explicó la lección.'], hueco:'_r.', respuesta:'Dr.'},
+      {partes:['Véase lo expuesto en las ', ' 12 y 13.'], hueco:'_p.', respuesta:'pp.'},
+      {partes:['El paquete pesaba 3 ', ' exactos.'], hueco:'_g', respuesta:'kg'},
+    ]
+  },
+
+  /* ── SIGLAS Y ACRÓNIMOS ── */
+  { cat:'siglas_acronimos', dif:'alto',
+    titulo:'Siglas, acrónimos y su tratamiento ortográfico',
+    explicacion:'Las siglas se escriben en mayúsculas sin puntos ni espacios entre letras: ONU, OTAN, UE, ISBN. Los acrónimos que se han lexicalizado (se pronuncian como una sola palabra) se escriben en minúscula, salvo la inicial si son nombres propios: ovni, láser, radar, sida.',
+    nota:'El plural de las siglas en español es invariable morfológicamente: las ONG (no las ONGs), los DVD (no los DVDs). Para indicar el plural se usa el artículo. Los acrónimos lexicalizados en minúscula sí forman plural: los láseres, los radares, los ovnis.',
+    ejemplos:[
+      'ONU, OTAN, RAE, ISBN → siglas: todas mayúsculas sin puntos',
+      'ovni, láser, radar, sida → acrónimos lexicalizados: minúscula',
+      'las ONG, los DVD, las pyme → plural con artículo, sigla invariable',
+    ],
+    ejercicios:[
+      {partes:['El avistamiento de ', ' fue noticia.'], hueco:'_vnis', respuesta:'ovnis'},
+      {partes:['La ', ' aprobó la resolución.'], hueco:'_NU', respuesta:'ONU'},
+      {partes:['Donaron dinero a varias ', '.'], hueco:'_NG', respuesta:'ONG'},
+      {partes:['El ', ' funciona por reflexión de ondas.'], hueco:'_adar', respuesta:'radar'},
+    ]
+  },
+
+  /* ── NÚMEROS ── */
+  { cat:'num_ortografia', dif:'medio',
+    titulo:'Números en textos: cuándo cifras y cuándo letras',
+    explicacion:'La RAE recomienda escribir con letras los números del 1 al 9 (o al 10 según autores) en textos no técnicos. Del 10 en adelante, cifras. Siempre con letras: al inicio de oración, en textos literarios, números redondos en lenguaje informal. Siempre con cifras: fechas, horas, porcentajes, datos estadísticos.',
+    nota:'Los números ordinales se escriben con letras hasta el décimo en textos formales: primero, segundo… décimo, undécimo, duodécimo. Del 11 en adelante se admite la cifra con el símbolo.º o .ª: 13.º, 21.ª. Nunca *1er ni *1ro: siempre primero, primer.',
+    ejemplos:[
+      'Tiene tres hijos (texto no técnico) / 3 de los 10 candidatos (estadística)',
+      'El 15 de octubre de 2023 / las 9:30 h / el 37 % de los encuestados',
+      'El undécimo candidato / el 12.º clasificado → ambas formas correctas',
+    ],
+    ejercicios:[
+      {partes:['La reunión es el ', ' de marzo.'], hueco:'_5 / quince', respuesta:'15'},
+      {partes:['Solo ', ' alumnos de diez aprobaron.'], hueco:'_res', respuesta:'tres'},
+      {partes:['El ', ' clasificado recibió diploma.'], hueco:'_ercer', respuesta:'tercer'},
+      {partes:['Asistieron ', ' personas al acto.'], hueco:'_iento veinte', respuesta:'ciento veinte'},
+    ]
+  },
+
+  /* ── SESEO Y CECEO ── */
+  { cat:'var_seseo_ceceo', dif:'alto',
+    titulo:'Seseo, ceceo y distinción: variedades normativas',
+    explicacion:'El seseo (pronunciar c ante e/i y z como s) es la norma en toda Hispanoamérica y en las Islas Canarias. Es válido ortográficamente porque la escritura no varía: se escribe igual independientemente de la pronunciación. El ceceo (pronunciar s como c/z) es un fenómeno regional no normativo.',
+    nota:'En el aula de magisterio es fundamental entender que el seseo NO es un error: es una variante normativa del español. Un maestro no debe corregir a un alumno hispanohablante que sesea, ya que su pronunciación es correcta en su variedad. Sí debe enseñar la ortografía única.',
+    ejemplos:[
+      'caza y casa → distinción castellana / suenan igual en zonas de seseo',
+      'La ortografía es única: siempre se escribe caza (del verbo cazar) y casa (vivienda)',
+      'cocer / coser → distinción fónica en castellano; seseo: suenan igual, se escriben diferente',
+    ],
+    ejercicios:[
+      {partes:['Fue a ', ' ciervos en el bosque.'], hueco:'_azar', respuesta:'cazar'},
+      {partes:['La ', ' de campo estaba vacía.'], hueco:'_asa', respuesta:'casa'},
+      {partes:['El chef va a ', ' las verduras.'], hueco:'_ocer', respuesta:'cocer'},
+      {partes:['La modista va a ', ' el vestido.'], hueco:'_oser', respuesta:'coser'},
+    ]
+  },
+  { cat:'var_yeismo', dif:'medio',
+    titulo:'Yeísmo: situación actual y consecuencias ortográficas',
+    explicacion:'El yeísmo (pronunciar ll como y) es hoy la pronunciación mayoritaria en España e Hispanoamérica. Es un fenómeno normativo en las variedades que lo practican. La ortografía sigue siendo la misma: valla/vaya, halla/haya, pollo/poyo se escriben diferente aunque suenen igual para un yeísta.',
+    nota:'El yeísmo obliga al hablante a aprender la ortografía de LL e Y de forma independiente a la pronunciación. Los pares mínimos más problemáticos: valla (cercado)/vaya (del verbo ir); halla (del verbo hallar)/haya (del verbo haber o árbol); pollo/poyo; malla/maya.',
+    ejemplos:[
+      'valla (cercado de madera) / vaya (¡vaya sorpresa!) → suenan igual para yeístas',
+      'halló la solución (hallar) / haya llegado (haber) → ortografía diferente',
+      'olla, sello, calle, lluvia → siempre con ll / ayer, yema, mayo → con y',
+    ],
+    ejercicios:[
+      {partes:['La ', ' del jardín estaba rota.'], hueco:'_alla', respuesta:'valla'},
+      {partes:['¡', ' usted con Dios!'], hueco:'_aya', respuesta:'Vaya'},
+      {partes:['El detective ', ' al culpable.'], hueco:'_alló', respuesta:'halló'},
+      {partes:['Es posible que no ', ' llegado aún.'], hueco:'_aya', respuesta:'haya'},
+    ]
+  },
+
+  /* ── NORMATIVA RAE ── */
+  { cat:'var_normativa', dif:'experto',
+    titulo:'Ortografía de 2010: cambios normativos principales',
+    explicacion:'La Ortografía de la RAE y la ASALE de 2010 introdujo cambios importantes. Los más relevantes: (1) Solo se escriben con tilde los pronombres demostrativos (este, ese, aquel) si hay ambigüedad real demostrable. (2) El adverbio "solo" no lleva tilde (salvo ambigüedad). (3) "Guion", "truhan", "fie", "lié" son monosílabos y no llevan tilde.',
+    nota:'Antes de 2010: "éste", "ése", "aquél" (pronombres) llevaban tilde obligatoria. Desde 2010: la tilde es opcional y solo recomendable si hay ambigüedad real. "Sólo" (adverbio) ya no lleva tilde salvo que el autor detecte ambigüedad. En pruebas de magisterio: seguir la norma de 2010.',
+    ejemplos:[
+      'solo quiero descansar (adverbio, sin tilde salvo ambigüedad)',
+      'este libro / ese alumno / aquel curso → sin tilde (norma 2010)',
+      'guion, truhan → monosílabos sin tilde (2010); antes: guión, truán',
+    ],
+    ejercicios:[
+      {partes:['', ' quiero que me escuches.'], hueco:'_olo', respuesta:'Solo'},
+      {partes:['', ' libro es el que me recomendó.'], hueco:'_ste', respuesta:'Este'},
+      {partes:['El texto necesitaba un ', '.'], hueco:'_uion', respuesta:'guion'},
+      {partes:['Aún no han llegado, ', ' ha habido retraso.'], hueco:'_olo', respuesta:'solo'},
+    ]
+  },
+];
+
+/* ══ ESTADO ══ */
+let selCats    = new Set();
+let reglasFilt = [];
+let idxActual  = -1;
+let reglaActual= null;
+let respuestas = [];
+let stTotal=0, stOk=0, stRegs=0;
+const bloqueAbierto = {};
+
+const CAT_NOMBRES = {};
+BLOQUES.forEach(b => b.cats.forEach(c => { CAT_NOMBRES[c.id]=c.nombre; }));
+
+const DIF_LABELS = { medio:'Nivel medio', alto:'Nivel alto', experto:'Nivel experto' };
+const DIF_CLASES = { medio:'dif-medio', alto:'dif-alto', experto:'dif-experto' };
+
+/* ══ RENDER PANEL ══ */
+function renderPanel(){
+  const cont = document.getElementById('bloques-container');
+  cont.innerHTML='';
+  BLOQUES.forEach(b=>{
+    const cids   = b.cats.map(c=>c.id);
+    const selN   = cids.filter(id=>selCats.has(id)).length;
+    const totR   = REGLAS.filter(r=>cids.includes(r.cat)).length;
+    const div    = document.createElement('div'); div.className='bloque';
+    const hdr    = document.createElement('div');
+    hdr.className='bloque-header'+(bloqueAbierto[b.id]?' abierto':'');
+    hdr.innerHTML=`
+      <div class="bloque-icono">${b.icono}</div>
+      <div class="bloque-info">
+        <div class="bloque-nombre">${b.nombre}</div>
+        <div class="bloque-desc">${b.desc}</div>
+      </div>
+      <span class="bloque-badge${selN>0?' tiene':''}">${selN>0?selN+' sel. · ':''}${totR} reglas</span>
+      <span class="bloque-chevron">▶</span>`;
+    hdr.onclick=()=>toggleBloque(b.id);
+    div.appendChild(hdr);
+    const cats=document.createElement('div');
+    cats.className='bloque-cats'+(bloqueAbierto[b.id]?' visible':'');
+    b.cats.forEach(c=>{
+      const nR=REGLAS.filter(r=>r.cat===c.id).length;
+      const sc=document.createElement('div');
+      sc.className='subcat'+(selCats.has(c.id)?' sel':'');
+      sc.innerHTML=`
+        <div class="subcat-check">
+          <svg viewBox="0 0 9 9" fill="none" stroke="white" stroke-width="2" stroke-linecap="round">
+            <polyline points="1,5 3.5,7.5 8,1.5"/>
+          </svg>
+        </div>
+        <div>
+          <div class="subcat-nombre">${c.nombre}</div>
+          <div class="subcat-n">${nR} regla${nR!==1?'s':''} · ${c.desc}</div>
+        </div>`;
+      sc.onclick=()=>toggleCat(c.id);
+      cats.appendChild(sc);
+    });
+    div.appendChild(cats);
+    cont.appendChild(div);
+  });
+  actualizarInfoSel();
+}
+
+function toggleBloque(bid){ bloqueAbierto[bid]=!bloqueAbierto[bid]; renderPanel(); }
+function toggleCat(cid){ selCats.has(cid)?selCats.delete(cid):selCats.add(cid); renderPanel(); }
+function selTodo(){ BLOQUES.forEach(b=>{b.cats.forEach(c=>selCats.add(c.id));bloqueAbierto[b.id]=true;}); renderPanel(); }
+function deselTodo(){ selCats.clear(); renderPanel(); }
+
+function actualizarInfoSel(){
+  const n=selCats.size, nR=REGLAS.filter(r=>selCats.has(r.cat)).length;
+  const info=document.getElementById('sel-info'), btn=document.getElementById('btn-emp');
+  if(!n){ info.innerHTML='Ninguna categoría seleccionada'; btn.style.display='none'; }
+  else { info.innerHTML=`<strong>${n}</strong> ${n===1?'categoría':'categorías'} · <strong>${nR}</strong> regla${nR!==1?'s':''}`; btn.style.display=''; }
+}
+
+/* ══ SESIONES ══ */
+function iniciarAleatorio(){ BLOQUES.forEach(b=>b.cats.forEach(c=>selCats.add(c.id))); iniciarSesion(true); }
+function iniciarSeleccion(){ if(!selCats.size)return; iniciarSesion(false); }
+
+function iniciarSesion(aleatorio){
+  reglasFilt=REGLAS.filter(r=>selCats.has(r.cat));
+  if(!reglasFilt.length)return;
+  stTotal=0; stOk=0; stRegs=0; actualizarStats();
+  document.getElementById('modo-badge').textContent=aleatorio?'ALEATORIO':'SELECCIÓN';
+  const bar=document.getElementById('cats-bar'); bar.innerHTML='';
+  BLOQUES.forEach(b=>{
+    const act=b.cats.filter(c=>selCats.has(c.id));
+    if(!act.length)return;
+    if(act.length===b.cats.length){ const sp=document.createElement('span');sp.className='ctag';sp.textContent=b.nombre;bar.appendChild(sp); }
+    else act.forEach(c=>{ const sp=document.createElement('span');sp.className='ctag';sp.textContent=CAT_NOMBRES[c.id]||c.id;bar.appendChild(sp); });
+  });
+  mostrarPantalla('pp'); idxActual=-1; nuevaRegla();
+}
+
+function volverPanel(){ mostrarPantalla('ps'); renderPanel(); }
+function mostrarPantalla(cual){
+  document.getElementById('ps').style.display=cual==='ps'?'block':'none';
+  document.getElementById('pp').style.display=cual==='pp'?'block':'none';
+}
+
+/* ══ PRÁCTICA ══ */
+function nuevaRegla(){
+  const t=document.getElementById('tarjeta'); t.classList.add('saliendo'); ocultarMarcador();
+  setTimeout(()=>{
+    let n; do{ n=Math.floor(Math.random()*reglasFilt.length); }while(n===idxActual&&reglasFilt.length>1);
+    idxActual=n; reglaActual=reglasFilt[n]; stRegs++; renderRegla(reglaActual);
+    t.classList.remove('saliendo'); actualizarStats();
+  },320);
+}
+
+function renderRegla(r){
+  document.getElementById('t-titulo').textContent=r.titulo;
+  document.getElementById('t-expl').textContent=r.explicacion;
+  document.getElementById('lbl-cat').textContent=CAT_NOMBRES[r.cat]||r.cat;
+  const difEl=document.getElementById('lbl-dif');
+  difEl.textContent=DIF_LABELS[r.dif]||''; difEl.className='t-label-dif '+(DIF_CLASES[r.dif]||'');
+
+  const notaEl=document.getElementById('t-nota');
+  if(r.nota){ notaEl.innerHTML=''; const d=document.createElement('div');d.className='nota';d.textContent='⚠ '+r.nota;notaEl.appendChild(d); }
+  else notaEl.innerHTML='';
+
+  const ul=document.getElementById('t-ejs'); ul.innerHTML='';
+  r.ejemplos.forEach(e=>{ const li=document.createElement('li');li.textContent=e;ul.appendChild(li); });
+
+  const dv=document.getElementById('t-ejercs'); dv.innerHTML='';
+  respuestas=Array(r.ejercicios.length).fill('');
+  r.ejercicios.forEach((ej,i)=>{
+    const w=document.createElement('div');w.className='ejerc';
+    const nn=document.createElement('div');nn.className='ejerc-n';nn.textContent=`Ejercicio ${i+1}`;w.appendChild(nn);
+    const tx=document.createElement('div');tx.className='ejerc-txt';
+    if(ej.partes[0]){const s=document.createElement('span');s.textContent=ej.partes[0];tx.appendChild(s);}
+    const inp=document.createElement('input');
+    inp.type='text';inp.className='hueco';inp.placeholder=ej.hueco;
+    inp.setAttribute('autocomplete','off');inp.setAttribute('autocorrect','off');inp.setAttribute('spellcheck','false');
+    inp.dataset.idx=i; inp.setAttribute('size',Math.max(ej.respuesta.length+2,6));
+    inp.addEventListener('input',function(){
+      respuestas[i]=this.value.trim();this.classList.remove('ok','ko');
+      const fb=document.getElementById('fb'+i);if(fb){fb.textContent='';fb.className='fb';}
+      ocultarMarcador();
+    });
+    tx.appendChild(inp);
+    if(ej.partes[1]){const s=document.createElement('span');s.textContent=ej.partes[1];tx.appendChild(s);}
+    w.appendChild(tx);
+    const fb=document.createElement('div');fb.className='fb';fb.id='fb'+i;w.appendChild(fb);
+    dv.appendChild(w);
+  });
+}
+
+function norm(s){ return s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[«»'"']/g,'').trim(); }
+
+function comprobar(){
+  if(!reglaActual)return;
+  let ok=0; const tot=reglaActual.ejercicios.length;
+  reglaActual.ejercicios.forEach((ej,i)=>{
+    const inp=document.querySelector(`.hueco[data-idx="${i}"]`);
+    const fb=document.getElementById('fb'+i);
+    const val=inp?norm(inp.value):''; const sol=norm(ej.respuesta);
+    if(val===sol||val===sol.replace(/\s/g,'')){
+      ok++; inp.classList.remove('ko');inp.classList.add('ok');
+      if(fb){fb.textContent='✓ Correcto';fb.className='fb ok';}
+    } else {
+      inp.classList.remove('ok');inp.classList.add('ko');
+      if(fb){fb.textContent=(val===''?'✗ Vacío':'✗ Incorrecto')+' — correcto: '+ej.respuesta;fb.className='fb ko';}
+    }
+  });
+  stTotal+=tot;stOk+=ok;actualizarStats();mostrarMarcador(ok,tot);
+}
+
+function actualizarStats(){
+  document.getElementById('st-tot').textContent=stTotal;
+  document.getElementById('st-ok').textContent=stOk;
+  document.getElementById('st-pct').textContent=stTotal>0?Math.round(stOk/stTotal*100)+'%':'—';
+  document.getElementById('st-reg').textContent=stRegs;
+}
+
+function mostrarMarcador(ok,tot){
+  const m=document.getElementById('marcador');m.classList.add('vis');
+  if(ok===tot){m.className='marcador vis perf';m.textContent=`🎉 ¡Perfecto! ${tot}/${tot} correctos.`;}
+  else if(ok>0){m.className='marcador vis parc';m.textContent=`Resultado: ${ok} de ${tot}. ¡Sigue repasando!`;}
+  else{m.className='marcador vis fallo';m.textContent=`0 de ${tot}. Revisa bien la regla y la nota.`;}
+}
+
+function ocultarMarcador(){ document.getElementById('marcador').classList.remove('vis'); }
+
+window.addEventListener('DOMContentLoaded',()=>{ mostrarPantalla('ps'); renderPanel(); });
+</script>
+</body>
+</html>
